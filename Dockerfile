@@ -43,5 +43,5 @@ EXPOSE 8000
 ENV PORT=8000
 ENV PYTHONPATH=/app
 
-# Start the application
+# Start the application - Railway deployment fix
 CMD ["python", "main.py"]

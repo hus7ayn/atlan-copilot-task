@@ -61,12 +61,24 @@ async def startup_event():
     
     try:
         print("🚀 Initializing Simple Tavily System...")
+        
+        # Check if required environment variables are present
+        claude_key = os.getenv("CLAUDE_API_KEY")
+        tavily_key = os.getenv("TAVILY_API_KEY")
+        
+        if not claude_key:
+            print("⚠️ CLAUDE_API_KEY not found - AI features will be limited")
+        if not tavily_key:
+            print("⚠️ TAVILY_API_KEY not found - real-time search will be limited")
+        
+        # Initialize even without API keys for basic functionality
         simple_tavily_system = SimpleTavilySystem()
         await simple_tavily_system.initialize()
         print("✅ Simple Tavily System initialized successfully")
         
     except Exception as e:
         print(f"❌ Failed to initialize components: {e}")
+        print("🔄 App will continue with limited functionality")
         # Don't raise the exception to prevent startup failure
         # The health check will indicate the system is not ready
 

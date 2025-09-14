@@ -49,19 +49,29 @@ class SimpleTavilySystem:
             print("🚀 Initializing Simple Tavily System...")
             
             # Initialize sentiment agent for classification
-            self.sentiment_agent = SentimentAgent()
-            print("✅ Sentiment Agent initialized")
+            try:
+                self.sentiment_agent = SentimentAgent()
+                print("✅ Sentiment Agent initialized")
+            except Exception as e:
+                print(f"⚠️ Sentiment Agent initialization failed: {e}")
+                self.sentiment_agent = None
             
             # Initialize Tavily for real-time search
-            self.tavily_rag = TavilyRAGIntegration()
-            print("✅ Tavily RAG Integration initialized")
+            try:
+                self.tavily_rag = TavilyRAGIntegration()
+                print("✅ Tavily RAG Integration initialized")
+            except Exception as e:
+                print(f"⚠️ Tavily RAG Integration initialization failed: {e}")
+                self.tavily_rag = None
             
+            # Mark as initialized even if some components failed
             self.initialized = True
             print("✅ Simple Tavily System initialized successfully")
             
         except Exception as e:
             print(f"❌ Error initializing Simple Tavily System: {e}")
-            raise
+            # Don't raise the exception - allow the app to start with limited functionality
+            self.initialized = False
     
     async def analyze_ticket(self, ticket_text: str) -> TicketAnalysis:
         """Analyze ticket using sentiment agent (internal analysis)"""

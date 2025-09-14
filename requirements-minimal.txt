@@ -1,0 +1,15 @@
+# Minimal requirements for basic functionality
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+python-dotenv
+requests
+PyPDF2
+python-docx
+beautifulsoup4
+lxml
+anthropic
+tavily-python
+pyyaml
+gunicorn

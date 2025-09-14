@@ -1,5 +1,5 @@
-# Use Python 3.11 slim image
-FROM python:3.11-slim
+# Use Python 3.13 slim image
+FROM python:3.13-slim
 
 # Set working directory
 WORKDIR /app
@@ -8,13 +8,25 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    libxml2-dev \
+    libxslt1-dev \
+    libffi-dev \
+    libssl-dev \
+    zlib1g-dev \
+    libjpeg-dev \
+    libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
-COPY requirements.txt .
+COPY requirements.txt requirements-minimal.txt requirements-no-chromadb.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Upgrade pip and install Python dependencies with fallbacks
+RUN pip install --upgrade pip setuptools wheel && \
+    (pip install --no-cache-dir --timeout=1000 -r requirements.txt || \
+     (echo "Failed to install with main requirements, trying without chromadb..." && \
+      pip install --no-cache-dir --timeout=1000 -r requirements-no-chromadb.txt || \
+      (echo "Failed to install without chromadb, trying minimal requirements..." && \
+       pip install --no-cache-dir --timeout=1000 -r requirements-minimal.txt)))
 
 # Copy application code
 COPY . .

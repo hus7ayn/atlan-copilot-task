@@ -708,6 +708,23 @@ if os.path.exists("client/build"):
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    print(f"🚀 Starting server on port {port}")
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    import os
+    
+    # Debug: Show all environment variables
+    print("🔍 Environment variables:")
+    for key, value in os.environ.items():
+        if 'PORT' in key.upper():
+            print(f"  {key}={value}")
+    
+    # Get port with fallback
+    port_str = os.getenv("PORT", "8000")
+    print(f"🔧 PORT environment variable: '{port_str}'")
+    
+    try:
+        port = int(port_str)
+        print(f"🚀 Starting server on port {port}")
+        uvicorn.run(app, host="0.0.0.0", port=port)
+    except ValueError as e:
+        print(f"❌ Error parsing PORT '{port_str}': {e}")
+        print("🔄 Using default port 8000")
+        uvicorn.run(app, host="0.0.0.0", port=8000)

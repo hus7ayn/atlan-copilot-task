@@ -82,10 +82,7 @@ async def startup_event():
         # Don't raise the exception to prevent startup failure
         # The health check will indicate the system is not ready
 
-@app.get("/")
-async def root():
-    """Root endpoint - simple health check"""
-    return {"status": "healthy", "message": "Atlan Customer Copilot API is running"}
+# Root route removed - will be handled by catch-all route for React app
 
 @app.get("/api/health")
 async def health_check():
@@ -711,4 +708,6 @@ if os.path.exists("client/build"):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    print(f"🚀 Starting server on port {port}")
+    uvicorn.run(app, host="0.0.0.0", port=port)

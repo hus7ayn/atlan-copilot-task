@@ -33,7 +33,8 @@ class SystemStarter:
             time.sleep(3)
             
             if self.backend_process.poll() is None:
-                print("✅ Backend server started on http://localhost:8000")
+                port = os.getenv("PORT", "8000")
+                print(f"✅ Backend server started on http://localhost:{port}")
                 return True
             else:
                 stdout, stderr = self.backend_process.communicate()

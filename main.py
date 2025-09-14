@@ -110,6 +110,10 @@ async def process_ticket(ticket: TicketInput):
         raise HTTPException(status_code=500, detail="Simple Tavily System not initialized")
     
     try:
+        # Check if sentiment agent is available
+        if not simple_tavily_system.sentiment_agent:
+            raise HTTPException(status_code=500, detail="Sentiment Agent not initialized - check API keys")
+        
         # Step 1: Classify the ticket
         print(f"🔍 Classifying ticket: {ticket.text[:50]}...")
         classification = simple_tavily_system.sentiment_agent.classify_ticket("", ticket.text)

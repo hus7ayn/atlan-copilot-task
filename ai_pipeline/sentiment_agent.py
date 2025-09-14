@@ -52,12 +52,14 @@ class SentimentAgent:
     def __init__(self):
         # Use the provided Claude API key from environment
         self.api_key = os.getenv("CLAUDE_API_KEY")
-        if not self.api_key:
-            raise ValueError("CLAUDE_API_KEY environment variable is required")
-        self.client = Anthropic(api_key=self.api_key)
+        self.client = None
         self.model = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
         self.temperature = float(os.getenv("CLAUDE_TEMPERATURE", "0.1"))
         self.max_tokens = int(os.getenv("CLAUDE_MAX_TOKENS", "1000"))
+        
+        # Initialize client only if API key is available
+        if self.api_key:
+            self.client = Anthropic(api_key=self.api_key)
         
         print("✅ Claude API client initialized successfully")
         
@@ -436,6 +438,10 @@ class SentimentAgent:
     
     def _get_llm_response(self, prompt: str) -> str:
         """Get response from Claude API with error handling and caching."""
+        # Check if client is initialized
+        if not self.client:
+            raise RuntimeError("Claude API client not initialized. Please set CLAUDE_API_KEY environment variable.")
+        
         # Check cache first
         cache_key = hashlib.md5(prompt.encode()).hexdigest()
         if cache_key in self._cache:

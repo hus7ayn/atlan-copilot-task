@@ -38,16 +38,15 @@ class TavilyRAGIntegration:
     def __init__(self, tavily_api_key: str = None):
         """Initialize Tavily integration for real-time RAG"""
         self.tavily_api_key = tavily_api_key or os.getenv("TAVILY_API_KEY")
-        if not self.tavily_api_key:
-            raise ValueError("TAVILY_API_KEY not found in environment variables")
         
         # Initialize Claude for answer generation
         claude_api_key = os.getenv("CLAUDE_API_KEY")
-        if not claude_api_key:
-            raise ValueError("CLAUDE_API_KEY not found in environment variables")
-        
-        self.llm_client = Anthropic(api_key=claude_api_key)
+        self.llm_client = None
         self.model = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+        
+        # Initialize clients only if API keys are available
+        if claude_api_key:
+            self.llm_client = Anthropic(api_key=claude_api_key)
         
         # Tavily API configuration
         self.tavily_base_url = "https://api.tavily.com"

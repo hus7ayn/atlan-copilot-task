@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Atlan Customer Copilot - Minimal Streamlit Application
-Ultra-simple version for deployment testing
+Atlan Customer Copilot - Basic Streamlit Application
+Minimal version for guaranteed deployment
 """
 
 import streamlit as st
@@ -19,20 +19,15 @@ st.set_page_config(
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
-def check_api_keys():
-    """Check if API keys are configured"""
-    claude_key = os.getenv("CLAUDE_API_KEY")
-    tavily_key = os.getenv("TAVILY_API_KEY")
-    return bool(claude_key and tavily_key)
-
 # Main app
 st.title("🤖 Atlan Customer Copilot")
 st.subheader("AI-Powered Customer Support Assistant")
 
 # Check API keys
-api_keys_configured = check_api_keys()
+claude_key = os.getenv("CLAUDE_API_KEY")
+tavily_key = os.getenv("TAVILY_API_KEY")
 
-if api_keys_configured:
+if claude_key and tavily_key:
     st.success("✅ API Keys Configured - System Ready!")
     
     # Simple chat interface
@@ -54,11 +49,13 @@ if api_keys_configured:
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 try:
-                    # Simple demo response
+                    # Demo response
                     response = f"Thanks for your question: '{prompt}'\n\n"
-                    response += "I'm your AI assistant powered by Claude and Tavily! "
-                    response += "I can help you with Atlan-related questions, documentation search, "
-                    response += "and customer support tasks.\n\n"
+                    response += "I'm your AI assistant! I can help you with:\n"
+                    response += "- Atlan platform questions\n"
+                    response += "- Data governance guidance\n"
+                    response += "- Technical troubleshooting\n"
+                    response += "- Best practices advice\n\n"
                     response += "What would you like to know?"
                     
                     st.markdown(response)
@@ -67,7 +64,6 @@ if api_keys_configured:
                 except Exception as e:
                     error_msg = f"Error: {str(e)}"
                     st.error(error_msg)
-                    st.session_state.messages.append({"role": "assistant", "content": error_msg})
     
     # Features section
     st.header("🚀 Features")
@@ -128,6 +124,18 @@ else:
     - Technical troubleshooting
     - Best practices advice
     """)
+
+# Status section
+st.header("📊 System Status")
+col1, col2 = st.columns(2)
+
+with col1:
+    st.metric("Claude API", "✅ Connected" if claude_key else "❌ Not Connected")
+    st.metric("Tavily API", "✅ Connected" if tavily_key else "❌ Not Connected")
+
+with col2:
+    st.metric("System Status", "✅ Ready" if (claude_key and tavily_key) else "⚠️ Setup Required")
+    st.metric("Last Updated", datetime.now().strftime("%Y-%m-%d %H:%M"))
 
 # Footer
 st.markdown("---")

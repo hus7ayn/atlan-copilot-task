@@ -52,8 +52,14 @@ class SentimentAgent:
     def __init__(self):
         # Use the provided Claude API key from environment
         self.api_key = os.getenv("CLAUDE_API_KEY")
+        print(f"🔍 SentimentAgent - CLAUDE_API_KEY present: {bool(self.api_key)}")
+        if self.api_key:
+            print(f"🔍 SentimentAgent - CLAUDE_API_KEY starts with: {self.api_key[:10]}...")
+        
         if not self.api_key:
             raise ValueError("CLAUDE_API_KEY environment variable is required")
+        
+        print(f"🔍 SentimentAgent - Initializing Anthropic client with key: {self.api_key[:10]}...")
         self.client = Anthropic(api_key=self.api_key)
         self.model = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
         self.temperature = float(os.getenv("CLAUDE_TEMPERATURE", "0.1"))

@@ -66,6 +66,13 @@ async def startup_event():
         claude_key = os.getenv("CLAUDE_API_KEY")
         tavily_key = os.getenv("TAVILY_API_KEY")
         
+        print(f"🔍 Debug - CLAUDE_API_KEY present: {bool(claude_key)}")
+        print(f"🔍 Debug - TAVILY_API_KEY present: {bool(tavily_key)}")
+        if claude_key:
+            print(f"🔍 Debug - CLAUDE_API_KEY starts with: {claude_key[:10]}...")
+        if tavily_key:
+            print(f"🔍 Debug - TAVILY_API_KEY starts with: {tavily_key[:10]}...")
+        
         if not claude_key:
             print("⚠️ CLAUDE_API_KEY not found - AI features will be limited")
         if not tavily_key:

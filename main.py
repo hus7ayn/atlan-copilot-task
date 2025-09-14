@@ -112,7 +112,7 @@ async def process_ticket(ticket: TicketInput):
     try:
         # Step 1: Classify the ticket
         print(f"🔍 Classifying ticket: {ticket.text[:50]}...")
-        classification = sentiment_agent.classify_ticket("", ticket.text)
+        classification = simple_tavily_system.sentiment_agent.classify_ticket("", ticket.text)
         
         # Prepare analysis data
         analysis = {

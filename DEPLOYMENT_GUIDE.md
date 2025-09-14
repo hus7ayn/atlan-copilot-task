@@ -1,170 +1,120 @@
-# 🚀 Atlan Customer Copilot Deployment Guide
+# 🚀 Railway Deployment Guide
 
-This guide will help you deploy your Atlan Customer Copilot application to production using Railway.
+## Quick Deployment Steps
 
-## 📋 Prerequisites
-
-1. **Railway Account**: Sign up at [railway.app](https://railway.app)
-2. **API Keys**:
-   - Claude API Key from [Anthropic Console](https://console.anthropic.com)
-   - Tavily API Key from [Tavily](https://tavily.com)
-
-## 🚀 Quick Deployment (Recommended)
-
-### Option 1: Automated Deployment
-
+### 1. **Prepare Your Repository**
+Make sure your code is pushed to GitHub:
 ```bash
-# Run the deployment script
-./deploy.sh
+git add .
+git commit -m "Prepare for Railway deployment"
+git push origin main
 ```
 
-### Option 2: Manual Deployment
+### 2. **Deploy to Railway**
 
-#### Step 1: Install Railway CLI
+#### Option A: Deploy via Railway Dashboard (Recommended)
+1. Go to [railway.app](https://railway.app)
+2. Sign up/Login with GitHub
+3. Click "New Project" → "Deploy from GitHub repo"
+4. Select your `ATLAN_CUSTOMER_COPILOT` repository
+5. Railway will automatically detect it's a Python/FastAPI app
+6. Click "Deploy"
+
+#### Option B: Deploy via Railway CLI
 ```bash
+# Install Railway CLI
 npm install -g @railway/cli
-```
 
-#### Step 2: Login to Railway
-```bash
+# Login to Railway
 railway login
+
+# Deploy from your project directory
+railway deploy
 ```
 
-#### Step 3: Initialize Project
-```bash
-railway init
-```
+### 3. **Configure Environment Variables**
 
-#### Step 4: Set Environment Variables
-Go to your Railway project dashboard → Variables tab and add:
+In Railway dashboard, go to your project → Variables tab and add:
 
 ```env
-CLAUDE_API_KEY=your_actual_claude_api_key
-TAVILY_API_KEY=your_actual_tavily_api_key
+# Required API Keys
+CLAUDE_API_KEY=your_claude_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
+
+# Optional Configuration
+CLAUDE_MODEL=claude-3-5-sonnet-20241022
+CLAUDE_TEMPERATURE=0.1
+CLAUDE_MAX_TOKENS=1000
 DEBUG=False
-HOST=0.0.0.0
-PORT=8000
 ```
 
-#### Step 5: Deploy
-```bash
-railway up
-```
+### 4. **Access Your Deployed App**
 
-## 🌐 Access Your Deployed Application
+After deployment (usually 2-3 minutes):
+- Railway will provide you with a URL like: `https://your-app-name.up.railway.app`
+- Your app will be accessible at this URL
+- API docs will be at: `https://your-app-name.up.railway.app/docs`
 
-After deployment, you'll get a URL like: `https://your-app-name.railway.app`
+## 🎯 What Happens During Deployment
 
-- **API Endpoint**: `https://your-app-name.railway.app/api/`
-- **Health Check**: `https://your-app-name.railway.app/api/health`
-- **API Docs**: `https://your-app-name.railway.app/docs`
+1. **Railway detects** your Python/FastAPI app
+2. **Installs dependencies** from `requirements.txt`
+3. **Builds React frontend** (`npm run build`)
+4. **Starts FastAPI server** on the provided PORT
+5. **Serves both API and React app** from the same domain
 
-## 🔧 Frontend Deployment (Optional)
+## 🔧 Custom Domain (Optional)
 
-If you want to deploy the React frontend separately:
+1. In Railway dashboard → Settings → Domains
+2. Add your custom domain (e.g., `your-app.com`)
+3. Railway provides SSL certificate automatically
 
-### Using Vercel (Recommended)
-1. Go to [vercel.com](https://vercel.com)
-2. Connect your GitHub repository
-3. Set build command: `cd client && npm run build`
-4. Set output directory: `client/build`
-5. Add environment variable: `REACT_APP_API_URL=https://your-app-name.railway.app`
+## 📊 Monitoring & Logs
 
-### Using Netlify
-1. Go to [netlify.com](https://netlify.com)
-2. Connect your GitHub repository
-3. Set build command: `cd client && npm run build`
-4. Set publish directory: `client/build`
-5. Add environment variable: `REACT_APP_API_URL=https://your-app-name.railway.app`
+- **Logs**: Available in Railway dashboard → Deployments → View Logs
+- **Metrics**: CPU, Memory, Network usage
+- **Deployments**: Automatic deployments on git push
 
-## 🔍 Monitoring & Debugging
+## 💰 Pricing
 
-### Railway Dashboard
-- Monitor logs: Railway Dashboard → Your Project → Deployments
-- View metrics: Railway Dashboard → Your Project → Metrics
-- Manage environment variables: Railway Dashboard → Your Project → Variables
-
-### Health Checks
-Your app includes automatic health checks at `/api/health`
-
-### Logs
-```bash
-# View live logs
-railway logs
-
-# View specific deployment logs
-railway logs --deployment your-deployment-id
-```
+- **Free Tier**: $5 credit monthly (usually enough for development)
+- **Pro**: $20/month for production use
+- **No credit card required** for free tier
 
 ## 🛠️ Troubleshooting
 
-### Common Issues
+### Common Issues:
 
-1. **API Keys Not Working**
-   - Verify keys are correctly set in Railway Variables
-   - Check that keys don't have extra spaces or quotes
+1. **Build Fails**: Check logs in Railway dashboard
+2. **Environment Variables**: Ensure all required vars are set
+3. **API Keys**: Make sure Claude and Tavily keys are valid
+4. **CORS Issues**: Already configured in your FastAPI app
 
-2. **CORS Issues**
-   - Update `CLIENT_URL` environment variable with your frontend URL
-   - Ensure `DEBUG=False` in production
-
-3. **Build Failures**
-   - Check Railway logs for specific error messages
-   - Verify all dependencies are in `requirements.txt`
-
-4. **App Not Starting**
-   - Check that port is set to `$PORT` (Railway requirement)
-   - Verify health check endpoint is working
-
-### Debug Commands
+### Debug Commands:
 ```bash
-# Check Railway status
+# Check Railway logs
+railway logs
+
+# Check deployment status
 railway status
 
-# View current environment variables
-railway variables
-
-# Connect to Railway shell
-railway connect
-
-# Restart deployment
+# Redeploy
 railway redeploy
 ```
 
-## 📊 Performance Optimization
+## 🎉 Success!
 
-### Production Settings
-- Set `DEBUG=False` for better performance
-- Use production-grade API keys
-- Monitor API usage and costs
+Once deployed, your Atlan Customer Copilot will be live at your Railway URL with:
+- ✅ Interactive AI Agent
+- ✅ Real-time documentation search
+- ✅ Ticket classification
+- ✅ File upload and parsing
+- ✅ Full-stack functionality
 
-### Scaling
-Railway automatically scales your application based on traffic. For high-traffic applications, consider:
-- Upgrading Railway plan
-- Implementing caching strategies
-- Using CDN for static assets
+## 📱 Mobile Access
 
-## 🔒 Security Best Practices
-
-1. **Environment Variables**: Never commit API keys to Git
-2. **CORS**: Restrict origins in production
-3. **HTTPS**: Railway provides automatic HTTPS
-4. **Rate Limiting**: Consider implementing rate limiting for API endpoints
-
-## 📈 Next Steps
-
-After successful deployment:
-1. Test all endpoints using the API documentation
-2. Set up monitoring and alerting
-3. Configure custom domain (optional)
-4. Set up CI/CD for automatic deployments
-
-## 🆘 Support
-
-- Railway Documentation: [docs.railway.app](https://docs.railway.app)
-- Railway Discord: [discord.gg/railway](https://discord.gg/railway)
-- Project Issues: Create an issue in your GitHub repository
-
----
-
-**🎉 Congratulations! Your Atlan Customer Copilot is now live in production!**
+Your deployed app will work on:
+- Desktop browsers
+- Mobile browsers
+- Tablet browsers
+- Progressive Web App (PWA) capabilities

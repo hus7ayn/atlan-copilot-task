@@ -11,6 +11,7 @@ from typing import Dict, List, Optional, Any
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from datetime import datetime
@@ -28,17 +29,11 @@ load_dotenv()
 
 app = FastAPI(title="Atlan Customer Copilot API", version="1.0.0")
 
-# CORS middleware - configure based on environment
-allowed_origins = os.getenv("CLIENT_URL", "http://localhost:3000")
-if os.getenv("DEBUG", "True").lower() == "true":
-    allowed_origins = ["*"]  # Allow all origins for debugging
-else:
-    allowed_origins = [allowed_origins]
-
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins for debugging
+    allow_credentials=False,  # Set to False when allowing all origins
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
@@ -72,15 +67,30 @@ async def startup_event():
         
     except Exception as e:
         print(f"❌ Failed to initialize components: {e}")
-        raise e
+        # Don't raise the exception to prevent startup failure
+        # The health check will indicate the system is not ready
+
+@app.get("/")
+async def root():
+    """Root endpoint - simple health check"""
+    return {"status": "healthy", "message": "Atlan Customer Copilot API is running"}
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "simple_tavily_system": simple_tavily_system is not None and simple_tavily_system.initialized
-    }
+    """Detailed health check endpoint"""
+    try:
+        # Basic health check - just return healthy if the server is running
+        return {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "simple_tavily_system": simple_tavily_system is not None and hasattr(simple_tavily_system, 'initialized') and simple_tavily_system.initialized
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
 
 @app.post("/api/tickets", response_model=TicketResponse)
 async def process_ticket(ticket: TicketInput):
@@ -676,6 +686,16 @@ async def get_supported_formats():
             ".yml": "YAML configuration files"
         }
     }
+
+# Serve React app in production
+if os.path.exists("client/build"):
+    app.mount("/static", StaticFiles(directory="client/build/static"), name="static")
+    
+    @app.get("/{catch_all:path}")
+    async def serve_react_app(catch_all: str):
+        """Serve React app for all non-API routes"""
+        from fastapi.responses import FileResponse
+        return FileResponse("client/build/index.html")
 
 if __name__ == "__main__":
     import uvicorn

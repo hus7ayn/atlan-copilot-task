@@ -13,6 +13,7 @@ from typing import Dict, List, Any, Optional, Union
 from pathlib import Path
 from datetime import datetime
 import PyPDF2
+import docx
 from docx import Document
 # import pandas as pd  # Removed to avoid compilation issues
 from bs4 import BeautifulSoup

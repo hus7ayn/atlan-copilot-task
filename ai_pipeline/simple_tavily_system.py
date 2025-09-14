@@ -48,6 +48,13 @@ class SimpleTavilySystem:
         try:
             print("🚀 Initializing Simple Tavily System...")
             
+            # Clear any proxy environment variables that might cause issues
+            proxy_vars = ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'NO_PROXY', 'no_proxy']
+            for var in proxy_vars:
+                if var in os.environ:
+                    print(f"🔧 Clearing proxy environment variable: {var}")
+                    del os.environ[var]
+            
             # Initialize sentiment agent for classification
             try:
                 # Check if API key is available before initializing

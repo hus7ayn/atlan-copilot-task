@@ -74,7 +74,10 @@ class TavilyRAGIntegration:
         print("✅ Tavily RAG Integration initialized")
 
     async def __aenter__(self):
+        # Create connector without proxy settings
+        connector = aiohttp.TCPConnector()
         self.session = aiohttp.ClientSession(
+            connector=connector,
             timeout=aiohttp.ClientTimeout(total=30),
             headers={
                 'Authorization': f'Bearer {self.tavily_api_key}',

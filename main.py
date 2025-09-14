@@ -95,11 +95,18 @@ async def startup_event():
 async def health_check():
     """Detailed health check endpoint"""
     try:
-        # Basic health check - just return healthy if the server is running
+        # Check environment variables
+        claude_key = os.getenv("CLAUDE_API_KEY")
+        tavily_key = os.getenv("TAVILY_API_KEY")
+        
         return {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
-            "simple_tavily_system": simple_tavily_system is not None and hasattr(simple_tavily_system, 'initialized') and simple_tavily_system.initialized
+            "simple_tavily_system": simple_tavily_system is not None and hasattr(simple_tavily_system, 'initialized') and simple_tavily_system.initialized,
+            "claude_key_present": bool(claude_key),
+            "tavily_key_present": bool(tavily_key),
+            "claude_key_start": claude_key[:10] + "..." if claude_key else None,
+            "tavily_key_start": tavily_key[:10] + "..." if tavily_key else None
         }
     except Exception as e:
         return {

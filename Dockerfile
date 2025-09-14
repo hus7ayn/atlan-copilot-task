@@ -43,5 +43,5 @@ EXPOSE 8000
 ENV PORT=8000
 ENV PYTHONPATH=/app
 
-# Start the application with proper port handling
-CMD ["sh", "-c", "echo '🔍 PORT variable: '$PORT && PORT=${PORT:-8000} && echo '🚀 Starting server on port '$PORT && uvicorn main:app --host 0.0.0.0 --port $PORT"]
+# Start the application
+CMD ["python", "main.py"]

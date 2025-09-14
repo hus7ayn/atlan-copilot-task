@@ -50,16 +50,28 @@ class SimpleTavilySystem:
             
             # Initialize sentiment agent for classification
             try:
-                self.sentiment_agent = SentimentAgent()
-                print("✅ Sentiment Agent initialized")
+                # Check if API key is available before initializing
+                claude_key = os.getenv("CLAUDE_API_KEY")
+                if claude_key:
+                    self.sentiment_agent = SentimentAgent()
+                    print("✅ Sentiment Agent initialized")
+                else:
+                    print("⚠️ CLAUDE_API_KEY not found - skipping Sentiment Agent")
+                    self.sentiment_agent = None
             except Exception as e:
                 print(f"⚠️ Sentiment Agent initialization failed: {e}")
                 self.sentiment_agent = None
             
             # Initialize Tavily for real-time search
             try:
-                self.tavily_rag = TavilyRAGIntegration()
-                print("✅ Tavily RAG Integration initialized")
+                # Check if API key is available before initializing
+                tavily_key = os.getenv("TAVILY_API_KEY")
+                if tavily_key:
+                    self.tavily_rag = TavilyRAGIntegration()
+                    print("✅ Tavily RAG Integration initialized")
+                else:
+                    print("⚠️ TAVILY_API_KEY not found - skipping Tavily RAG")
+                    self.tavily_rag = None
             except Exception as e:
                 print(f"⚠️ Tavily RAG Integration initialization failed: {e}")
                 self.tavily_rag = None

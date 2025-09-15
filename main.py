@@ -115,6 +115,51 @@ async def health_check():
             "timestamp": datetime.now().isoformat()
         }
 
+@app.get("/api/test-grok")
+async def test_grok():
+    """Test Grok API directly"""
+    try:
+        import requests
+        
+        grok_key = os.getenv("GROK_API_KEY")
+        if not grok_key:
+            return {"error": "GROK_API_KEY not found"}
+        
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {grok_key}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "gemma2-9b-it",
+            "messages": [{"role": "user", "content": "Hello, test message"}],
+            "max_tokens": 50,
+            "temperature": 0.1
+        }
+        
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        
+        if response.status_code == 200:
+            result = response.json()
+            return {
+                "status": "success",
+                "response": result["choices"][0]["message"]["content"],
+                "status_code": response.status_code
+            }
+        else:
+            return {
+                "status": "error",
+                "status_code": response.status_code,
+                "response": response.text
+            }
+            
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "error_type": type(e).__name__
+        }
+
 @app.post("/api/tickets", response_model=TicketResponse)
 async def process_ticket(ticket: TicketInput):
     """

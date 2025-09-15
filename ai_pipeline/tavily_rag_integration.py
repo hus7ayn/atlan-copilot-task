@@ -46,7 +46,20 @@ class TavilyRAGIntegration:
         if not claude_api_key:
             raise ValueError("CLAUDE_API_KEY not found in environment variables")
         
-        self.llm_client = Anthropic(api_key=claude_api_key)
+        # Initialize Anthropic client with explicit configuration to avoid proxies
+        try:
+            self.llm_client = Anthropic(
+                api_key=claude_api_key,
+                http_client=None  # Use default HTTP client without proxy configuration
+            )
+        except Exception as e:
+            print(f"❌ Error initializing Anthropic client in TavilyRAG: {e}")
+            # Try alternative initialization
+            import httpx
+            self.llm_client = Anthropic(
+                api_key=claude_api_key,
+                http_client=httpx.Client(proxies=None)
+            )
         self.model = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
         
         # Tavily API configuration

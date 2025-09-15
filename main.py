@@ -198,7 +198,7 @@ async def process_ticket(ticket: TicketInput):
         if topic_tags.intersection(rag_topics):
             # Use RAG system
             print(f"🤖 Using RAG for topics: {topic_tags.intersection(rag_topics)}")
-            final_response, sources = await rag_system.get_answer(ticket.text, classification.topic_tags)
+            final_response, sources = await simple_tavily_system.tavily_rag.get_answer(ticket.text, classification.topic_tags)
             
             return TicketResponse(
                 analysis=analysis,

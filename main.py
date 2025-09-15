@@ -63,7 +63,7 @@ async def startup_event():
         print("🚀 Initializing Simple Tavily System...")
         
         # Check if required environment variables are present
-        grok_key = os.getenv("GROK_API_KEY")
+        grok_key = os.getenv("GROK_API_KEY", "").strip()
         tavily_key = os.getenv("TAVILY_API_KEY")
         
         print(f"🔍 Debug - GROK_API_KEY present: {bool(grok_key)}")
@@ -96,7 +96,7 @@ async def health_check():
     """Detailed health check endpoint"""
     try:
         # Check environment variables
-        grok_key = os.getenv("GROK_API_KEY")
+        grok_key = os.getenv("GROK_API_KEY", "").strip()
         tavily_key = os.getenv("TAVILY_API_KEY")
         
         return {
@@ -121,7 +121,7 @@ async def test_grok():
     try:
         import requests
         
-        grok_key = os.getenv("GROK_API_KEY")
+        grok_key = os.getenv("GROK_API_KEY", "").strip()
         if not grok_key:
             return {"error": "GROK_API_KEY not found"}
         

@@ -51,7 +51,7 @@ class ClassificationResult:
 class SentimentAgent:
     def __init__(self):
         # Use the provided Grok API key from environment
-        self.api_key = os.getenv("GROK_API_KEY")
+        self.api_key = os.getenv("GROK_API_KEY", "").strip()
         print(f"🔍 SentimentAgent - GROK_API_KEY present: {bool(self.api_key)}")
         if self.api_key:
             print(f"🔍 SentimentAgent - GROK_API_KEY starts with: {self.api_key[:10]}...")

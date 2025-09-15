@@ -42,7 +42,7 @@ class TavilyRAGIntegration:
             raise ValueError("TAVILY_API_KEY not found in environment variables")
         
         # Initialize Grok for answer generation
-        grok_api_key = os.getenv("GROK_API_KEY")
+        grok_api_key = os.getenv("GROK_API_KEY", "").strip()
         if not grok_api_key:
             raise ValueError("GROK_API_KEY not found in environment variables")
         

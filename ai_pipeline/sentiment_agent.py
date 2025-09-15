@@ -60,6 +60,8 @@ class SentimentAgent:
             raise ValueError("CLAUDE_API_KEY environment variable is required")
         
         print(f"🔍 SentimentAgent - Initializing Anthropic client with key: {self.api_key[:10]}...")
+        print(f"🔍 SentimentAgent - Full API key length: {len(self.api_key)}")
+        print(f"🔍 SentimentAgent - API key starts with: {self.api_key[:20]}...")
         
         # Initialize Anthropic client with explicit configuration to avoid proxies
         try:
@@ -68,6 +70,7 @@ class SentimentAgent:
                 # Explicitly disable any proxy settings
                 http_client=None  # Use default HTTP client without proxy configuration
             )
+            print("✅ Anthropic client initialized with default HTTP client")
         except Exception as e:
             print(f"❌ Error initializing Anthropic client: {e}")
             # Try alternative initialization
@@ -76,6 +79,7 @@ class SentimentAgent:
                 api_key=self.api_key,
                 http_client=httpx.Client(proxies=None)
             )
+            print("✅ Anthropic client initialized with httpx fallback")
         self.model = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
         self.temperature = float(os.getenv("CLAUDE_TEMPERATURE", "0.1"))
         self.max_tokens = int(os.getenv("CLAUDE_MAX_TOKENS", "1000"))

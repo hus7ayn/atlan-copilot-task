@@ -469,22 +469,32 @@ class SentimentAgent:
         
         import time
         import random
+        import requests
         max_retries = 3
         base_delay = 1
         
         for attempt in range(max_retries):
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature,
-                    messages=[
+                # Use direct HTTP request instead of Groq client for Railway compatibility
+                url = "https://api.groq.com/openai/v1/chat/completions"
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json"
+                }
+                data = {
+                    "model": self.model,
+                    "messages": [
                         {"role": "system", "content": "You are a ticket classifier. Respond with JSON only. No reasoning, no explanations, no additional text. Just the JSON object."},
                         {"role": "user", "content": prompt}
-                    ]
-                )
+                    ],
+                    "max_tokens": self.max_tokens,
+                    "temperature": self.temperature
+                }
                 
-                result = response.choices[0].message.content
+                response = requests.post(url, headers=headers, json=data, timeout=30)
+                response.raise_for_status()
+                
+                result = response.json()["choices"][0]["message"]["content"]
                 # Cache the successful response
                 self._cache_response(cache_key, result)
                 return result

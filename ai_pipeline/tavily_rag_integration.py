@@ -318,17 +318,29 @@ Response Format:
 
 Answer:"""
 
-            response = self.llm_client.chat.completions.create(
-                model=self.model,
-                max_tokens=1500,
-                temperature=0.1,
-                messages=[
+            # Use direct HTTP request instead of Groq client for Railway compatibility
+            import requests
+            
+            url = "https://api.groq.com/openai/v1/chat/completions"
+            grok_api_key = os.getenv("GROK_API_KEY")
+            headers = {
+                "Authorization": f"Bearer {grok_api_key}",
+                "Content-Type": "application/json"
+            }
+            data = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": "You are an expert Atlan support assistant specializing in summarizing and synthesizing documentation. Your role is to:\n\n1. **Summarize** complex documentation into clear, actionable guidance\n2. **Synthesize** information from multiple sources into coherent responses\n3. **Structure** answers with clear sections and bullet points\n4. **Extract** key steps, requirements, and important details\n5. **Provide** comprehensive yet concise answers\n6. **Reference** sources naturally within your responses\n\nAlways prioritize accuracy, clarity, and actionable guidance based on the current Atlan documentation."},
                     {"role": "user", "content": prompt}
-                ]
-            )
+                ],
+                "max_tokens": 1500,
+                "temperature": 0.1
+            }
             
-            answer = response.choices[0].message.content.strip()
+            response = requests.post(url, headers=headers, json=data, timeout=30)
+            response.raise_for_status()
+            
+            answer = response.json()["choices"][0]["message"]["content"].strip()
             
             # Clean up any source URLs that might have been included in the answer
             # Remove common source patterns

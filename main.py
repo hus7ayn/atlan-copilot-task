@@ -196,20 +196,14 @@ async def process_ticket(ticket: TicketInput):
         topic_tags = {tag.value for tag in classification.topic_tags}
         
         if topic_tags.intersection(rag_topics):
-            # Use RAG system
+            # Use RAG system - same as interactive agent
             print(f"🤖 Using RAG for topics: {topic_tags.intersection(rag_topics)}")
-            # Use hybrid search for RAG - Railway deployment fix
-            final_response, sources = await simple_tavily_system.tavily_rag.hybrid_search(
-                ticket.text, 
-                [tag.value for tag in classification.topic_tags],
-                static_answer="", 
-                static_confidence=0.0
-            )
+            tavily_response = await simple_tavily_system.process_ticket(ticket.text)
             
             return TicketResponse(
                 analysis=analysis,
-                final_response=final_response,
-                sources=sources
+                final_response=tavily_response.answer,
+                sources=tavily_response.sources
             )
         else:
             # Route to appropriate team

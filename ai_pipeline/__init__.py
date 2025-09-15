@@ -6,14 +6,11 @@ including sentiment analysis, topic classification, and priority assignment.
 """
 
 from .sentiment_agent import SentimentAgent, ClassificationResult, TopicTag, Sentiment, Priority
-from .ticket_classifier import TicketClassifier, Ticket
 
 __all__ = [
     'SentimentAgent',
     'ClassificationResult',
     'TopicTag',
     'Sentiment',
-    'Priority',
-    'TicketClassifier',
-    'Ticket'
+    'Priority'
 ]

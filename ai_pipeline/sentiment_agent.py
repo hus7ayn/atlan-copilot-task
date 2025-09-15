@@ -63,13 +63,23 @@ class SentimentAgent:
         print(f"🔍 SentimentAgent - Full API key length: {len(self.api_key)}")
         print(f"🔍 SentimentAgent - API key starts with: {self.api_key[:20]}...")
         
-        # Initialize Grok client
+        # Initialize Grok client with Railway-compatible settings
         try:
-            self.client = Groq(api_key=self.api_key)
+            self.client = Groq(
+                api_key=self.api_key,
+                timeout=30.0,
+                max_retries=3
+            )
             print("✅ Grok client initialized successfully")
         except Exception as e:
             print(f"❌ Error initializing Grok client: {e}")
-            raise e
+            # Try with explicit HTTP client configuration
+            import httpx
+            self.client = Groq(
+                api_key=self.api_key,
+                http_client=httpx.Client(timeout=30.0, limits=httpx.Limits(max_connections=10))
+            )
+            print("✅ Grok client initialized with httpx fallback")
         
         self.model = os.getenv("GROK_MODEL", "gemma2-9b-it")
         self.temperature = float(os.getenv("GROK_TEMPERATURE", "0.1"))

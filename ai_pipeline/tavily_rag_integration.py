@@ -46,12 +46,22 @@ class TavilyRAGIntegration:
         if not grok_api_key:
             raise ValueError("GROK_API_KEY not found in environment variables")
         
-        # Initialize Grok client
+        # Initialize Grok client with Railway-compatible settings
         try:
-            self.llm_client = Groq(api_key=grok_api_key)
+            self.llm_client = Groq(
+                api_key=grok_api_key,
+                timeout=30.0,
+                max_retries=3
+            )
         except Exception as e:
             print(f"❌ Error initializing Grok client in TavilyRAG: {e}")
-            raise e
+            # Try with explicit HTTP client configuration
+            import httpx
+            self.llm_client = Groq(
+                api_key=grok_api_key,
+                http_client=httpx.Client(timeout=30.0, limits=httpx.Limits(max_connections=10))
+            )
+            print("✅ Grok client initialized with httpx fallback in TavilyRAG")
         self.model = os.getenv("GROK_MODEL", "gemma2-9b-it")
         
         # Tavily API configuration

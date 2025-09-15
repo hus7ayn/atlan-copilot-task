@@ -196,7 +196,7 @@ async def process_ticket(ticket: TicketInput):
         topic_tags = {tag.value for tag in classification.topic_tags}
         
         if topic_tags.intersection(rag_topics):
-            # Use RAG system - same as interactive agent
+            # Use RAG system - same as interactive agent - FORCE REBUILD
             print(f"🤖 Using RAG for topics: {topic_tags.intersection(rag_topics)}")
             tavily_response = await simple_tavily_system.process_ticket(ticket.text)
             

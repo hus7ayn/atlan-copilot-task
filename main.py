@@ -200,10 +200,19 @@ async def process_ticket(ticket: TicketInput):
             print(f"🤖 Using RAG for topics: {topic_tags.intersection(rag_topics)}")
             tavily_response = await simple_tavily_system.process_ticket(ticket.text)
             
+            # Extract URLs from source objects
+            source_urls = []
+            if tavily_response.sources:
+                for source in tavily_response.sources:
+                    if isinstance(source, dict) and 'url' in source:
+                        source_urls.append(source['url'])
+                    elif isinstance(source, str):
+                        source_urls.append(source)
+            
             return TicketResponse(
                 analysis=analysis,
                 final_response=tavily_response.answer,
-                sources=tavily_response.sources
+                sources=source_urls
             )
         else:
             # Route to appropriate team

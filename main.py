@@ -766,6 +766,11 @@ if os.path.exists("client/build"):
     @app.get("/{catch_all:path}")
     async def serve_react_app(catch_all: str):
         """Serve React app for all non-API routes"""
+        # Skip API routes
+        if catch_all.startswith("api/"):
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="API endpoint not found")
+        
         from fastapi.responses import FileResponse
         return FileResponse("client/build/index.html")
 

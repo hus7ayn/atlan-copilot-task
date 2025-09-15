@@ -322,7 +322,7 @@ Answer:"""
             import requests
             
             url = "https://api.groq.com/openai/v1/chat/completions"
-            grok_api_key = os.getenv("GROK_API_KEY")
+            grok_api_key = os.getenv("GROK_API_KEY", "").strip()
             headers = {
                 "Authorization": f"Bearer {grok_api_key}",
                 "Content-Type": "application/json"

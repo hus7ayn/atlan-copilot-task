@@ -198,7 +198,7 @@ async def process_ticket(ticket: TicketInput):
         if topic_tags.intersection(rag_topics):
             # Use RAG system
             print(f"🤖 Using RAG for topics: {topic_tags.intersection(rag_topics)}")
-            # Use hybrid search for RAG
+            # Use hybrid search for RAG - Railway deployment fix
             final_response, sources = await simple_tavily_system.tavily_rag.hybrid_search(ticket.text, [tag.value for tag in classification.topic_tags])
             
             return TicketResponse(

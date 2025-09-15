@@ -10,7 +10,7 @@ import json
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 import aiohttp
-from anthropic import Anthropic
+from groq import Groq
 from dotenv import load_dotenv
 import hashlib
 import time
@@ -41,26 +41,18 @@ class TavilyRAGIntegration:
         if not self.tavily_api_key:
             raise ValueError("TAVILY_API_KEY not found in environment variables")
         
-        # Initialize Claude for answer generation
-        claude_api_key = os.getenv("CLAUDE_API_KEY")
-        if not claude_api_key:
-            raise ValueError("CLAUDE_API_KEY not found in environment variables")
+        # Initialize Grok for answer generation
+        grok_api_key = os.getenv("GROK_API_KEY")
+        if not grok_api_key:
+            raise ValueError("GROK_API_KEY not found in environment variables")
         
-        # Initialize Anthropic client with explicit configuration to avoid proxies
+        # Initialize Grok client
         try:
-            self.llm_client = Anthropic(
-                api_key=claude_api_key,
-                http_client=None  # Use default HTTP client without proxy configuration
-            )
+            self.llm_client = Groq(api_key=grok_api_key)
         except Exception as e:
-            print(f"❌ Error initializing Anthropic client in TavilyRAG: {e}")
-            # Try alternative initialization
-            import httpx
-            self.llm_client = Anthropic(
-                api_key=claude_api_key,
-                http_client=httpx.Client(proxies=None)
-            )
-        self.model = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+            print(f"❌ Error initializing Grok client in TavilyRAG: {e}")
+            raise e
+        self.model = os.getenv("GROK_MODEL", "gemma2-9b-it")
         
         # Tavily API configuration
         self.tavily_base_url = "https://api.tavily.com"
@@ -316,17 +308,17 @@ Response Format:
 
 Answer:"""
 
-            response = self.llm_client.messages.create(
+            response = self.llm_client.chat.completions.create(
                 model=self.model,
                 max_tokens=1500,
                 temperature=0.1,
-                system="You are an expert Atlan support assistant specializing in summarizing and synthesizing documentation. Your role is to:\n\n1. **Summarize** complex documentation into clear, actionable guidance\n2. **Synthesize** information from multiple sources into coherent responses\n3. **Structure** answers with clear sections and bullet points\n4. **Extract** key steps, requirements, and important details\n5. **Provide** comprehensive yet concise answers\n6. **Reference** sources naturally within your responses\n\nAlways prioritize accuracy, clarity, and actionable guidance based on the current Atlan documentation.",
                 messages=[
+                    {"role": "system", "content": "You are an expert Atlan support assistant specializing in summarizing and synthesizing documentation. Your role is to:\n\n1. **Summarize** complex documentation into clear, actionable guidance\n2. **Synthesize** information from multiple sources into coherent responses\n3. **Structure** answers with clear sections and bullet points\n4. **Extract** key steps, requirements, and important details\n5. **Provide** comprehensive yet concise answers\n6. **Reference** sources naturally within your responses\n\nAlways prioritize accuracy, clarity, and actionable guidance based on the current Atlan documentation."},
                     {"role": "user", "content": prompt}
                 ]
             )
             
-            answer = response.content[0].text.strip()
+            answer = response.choices[0].message.content.strip()
             
             # Clean up any source URLs that might have been included in the answer
             # Remove common source patterns

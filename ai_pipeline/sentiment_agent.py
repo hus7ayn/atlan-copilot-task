@@ -12,7 +12,7 @@ from enum import Enum
 import requests
 from dotenv import load_dotenv
 import os
-from anthropic import Anthropic
+from groq import Groq
 
 load_dotenv()
 
@@ -50,41 +50,32 @@ class ClassificationResult:
 
 class SentimentAgent:
     def __init__(self):
-        # Use the provided Claude API key from environment
-        self.api_key = os.getenv("CLAUDE_API_KEY")
-        print(f"🔍 SentimentAgent - CLAUDE_API_KEY present: {bool(self.api_key)}")
+        # Use the provided Grok API key from environment
+        self.api_key = os.getenv("GROK_API_KEY")
+        print(f"🔍 SentimentAgent - GROK_API_KEY present: {bool(self.api_key)}")
         if self.api_key:
-            print(f"🔍 SentimentAgent - CLAUDE_API_KEY starts with: {self.api_key[:10]}...")
+            print(f"🔍 SentimentAgent - GROK_API_KEY starts with: {self.api_key[:10]}...")
         
         if not self.api_key:
-            raise ValueError("CLAUDE_API_KEY environment variable is required")
+            raise ValueError("GROK_API_KEY environment variable is required")
         
-        print(f"🔍 SentimentAgent - Initializing Anthropic client with key: {self.api_key[:10]}...")
+        print(f"🔍 SentimentAgent - Initializing Grok client with key: {self.api_key[:10]}...")
         print(f"🔍 SentimentAgent - Full API key length: {len(self.api_key)}")
         print(f"🔍 SentimentAgent - API key starts with: {self.api_key[:20]}...")
         
-        # Initialize Anthropic client with explicit configuration to avoid proxies
+        # Initialize Grok client
         try:
-            self.client = Anthropic(
-                api_key=self.api_key,
-                # Explicitly disable any proxy settings
-                http_client=None  # Use default HTTP client without proxy configuration
-            )
-            print("✅ Anthropic client initialized with default HTTP client")
+            self.client = Groq(api_key=self.api_key)
+            print("✅ Grok client initialized successfully")
         except Exception as e:
-            print(f"❌ Error initializing Anthropic client: {e}")
-            # Try alternative initialization
-            import httpx
-            self.client = Anthropic(
-                api_key=self.api_key,
-                http_client=httpx.Client(proxies=None)
-            )
-            print("✅ Anthropic client initialized with httpx fallback")
-        self.model = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
-        self.temperature = float(os.getenv("CLAUDE_TEMPERATURE", "0.1"))
-        self.max_tokens = int(os.getenv("CLAUDE_MAX_TOKENS", "1000"))
+            print(f"❌ Error initializing Grok client: {e}")
+            raise e
         
-        print("✅ Claude API client initialized successfully")
+        self.model = os.getenv("GROK_MODEL", "gemma2-9b-it")
+        self.temperature = float(os.getenv("GROK_TEMPERATURE", "0.1"))
+        self.max_tokens = int(os.getenv("GROK_MAX_TOKENS", "1000"))
+        
+        print("✅ Grok API client initialized successfully")
         
         # Add caching for API responses to reduce API calls
         self._cache = {}
@@ -460,7 +451,7 @@ class SentimentAgent:
         return results
     
     def _get_llm_response(self, prompt: str) -> str:
-        """Get response from Claude API with error handling and caching."""
+        """Get response from Grok API with error handling and caching."""
         # Check cache first
         cache_key = hashlib.md5(prompt.encode()).hexdigest()
         if cache_key in self._cache:
@@ -473,17 +464,17 @@ class SentimentAgent:
         
         for attempt in range(max_retries):
             try:
-                response = self.client.messages.create(
+                response = self.client.chat.completions.create(
                     model=self.model,
                     max_tokens=self.max_tokens,
                     temperature=self.temperature,
-                    system="You are a ticket classifier. Respond with JSON only. No reasoning, no explanations, no additional text. Just the JSON object.",
                     messages=[
+                        {"role": "system", "content": "You are a ticket classifier. Respond with JSON only. No reasoning, no explanations, no additional text. Just the JSON object."},
                         {"role": "user", "content": prompt}
                     ]
                 )
                 
-                result = response.content[0].text
+                result = response.choices[0].message.content
                 # Cache the successful response
                 self._cache_response(cache_key, result)
                 return result

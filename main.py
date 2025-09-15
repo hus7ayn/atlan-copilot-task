@@ -63,18 +63,18 @@ async def startup_event():
         print("🚀 Initializing Simple Tavily System...")
         
         # Check if required environment variables are present
-        claude_key = os.getenv("CLAUDE_API_KEY")
+        grok_key = os.getenv("GROK_API_KEY")
         tavily_key = os.getenv("TAVILY_API_KEY")
         
-        print(f"🔍 Debug - CLAUDE_API_KEY present: {bool(claude_key)}")
+        print(f"🔍 Debug - GROK_API_KEY present: {bool(grok_key)}")
         print(f"🔍 Debug - TAVILY_API_KEY present: {bool(tavily_key)}")
-        if claude_key:
-            print(f"🔍 Debug - CLAUDE_API_KEY starts with: {claude_key[:10]}...")
+        if grok_key:
+            print(f"🔍 Debug - GROK_API_KEY starts with: {grok_key[:10]}...")
         if tavily_key:
             print(f"🔍 Debug - TAVILY_API_KEY starts with: {tavily_key[:10]}...")
         
-        if not claude_key:
-            print("⚠️ CLAUDE_API_KEY not found - AI features will be limited")
+        if not grok_key:
+            print("⚠️ GROK_API_KEY not found - AI features will be limited")
         if not tavily_key:
             print("⚠️ TAVILY_API_KEY not found - real-time search will be limited")
         
@@ -96,16 +96,16 @@ async def health_check():
     """Detailed health check endpoint"""
     try:
         # Check environment variables
-        claude_key = os.getenv("CLAUDE_API_KEY")
+        grok_key = os.getenv("GROK_API_KEY")
         tavily_key = os.getenv("TAVILY_API_KEY")
         
         return {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
             "simple_tavily_system": simple_tavily_system is not None and hasattr(simple_tavily_system, 'initialized') and simple_tavily_system.initialized,
-            "claude_key_present": bool(claude_key),
+            "grok_key_present": bool(grok_key),
             "tavily_key_present": bool(tavily_key),
-            "claude_key_start": claude_key[:10] + "..." if claude_key else None,
+            "grok_key_start": grok_key[:10] + "..." if grok_key else None,
             "tavily_key_start": tavily_key[:10] + "..." if tavily_key else None
         }
     except Exception as e:

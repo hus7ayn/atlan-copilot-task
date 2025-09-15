@@ -58,12 +58,12 @@ class SimpleTavilySystem:
             # Initialize sentiment agent for classification
             try:
                 # Check if API key is available before initializing
-                claude_key = os.getenv("CLAUDE_API_KEY")
-                if claude_key:
+                grok_key = os.getenv("GROK_API_KEY")
+                if grok_key:
                     self.sentiment_agent = SentimentAgent()
                     print("✅ Sentiment Agent initialized")
                 else:
-                    print("⚠️ CLAUDE_API_KEY not found - skipping Sentiment Agent")
+                    print("⚠️ GROK_API_KEY not found - skipping Sentiment Agent")
                     self.sentiment_agent = None
             except Exception as e:
                 print(f"⚠️ Sentiment Agent initialization failed: {e}")

@@ -132,9 +132,11 @@ async def test_grok():
             "key_start": grok_key[:10] + "..." if grok_key else None,
             "key_end": "..." + grok_key[-10:] if grok_key and len(grok_key) > 10 else None,
             "key_has_newline": "\\n" in grok_key if grok_key else False,
-            "key_has_carriage_return": "\\r" in grok_key if grok_key else False
+            "key_has_carriage_return": "\\r" in grok_key if grok_key else False,
+            "raw_key_bytes": [ord(c) for c in grok_key[:20]] if grok_key else None
         }
         
+        # Test the exact same request that SentimentAgent makes
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {grok_key}",
@@ -142,8 +144,11 @@ async def test_grok():
         }
         data = {
             "model": "gemma2-9b-it",
-            "messages": [{"role": "user", "content": "Hello, test message"}],
-            "max_tokens": 50,
+            "messages": [
+                {"role": "system", "content": "You are a ticket classifier. Respond with JSON only. No reasoning, no explanations, no additional text. Just the JSON object."},
+                {"role": "user", "content": "Classify this ticket: Hello, I need help with SSO setup"}
+            ],
+            "max_tokens": 1000,
             "temperature": 0.1
         }
         

@@ -63,8 +63,10 @@ class SentimentAgent:
         print(f"🔍 SentimentAgent - Full API key length: {len(self.api_key)}")
         print(f"🔍 SentimentAgent - API key starts with: {self.api_key[:20]}...")
         print(f"🔍 SentimentAgent - API key ends with: ...{self.api_key[-10:]}")
-        print(f"🔍 SentimentAgent - API key has newline: {'\\n' in self.api_key}")
-        print(f"🔍 SentimentAgent - API key has carriage return: {'\\r' in self.api_key}")
+        newline_char = '\n'
+        carriage_return_char = '\r'
+        print(f"🔍 SentimentAgent - API key has newline: {newline_char in self.api_key}")
+        print(f"🔍 SentimentAgent - API key has carriage return: {carriage_return_char in self.api_key}")
         
         # Initialize Grok client with Railway-compatible settings
         try:

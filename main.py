@@ -125,6 +125,16 @@ async def test_grok():
         if not grok_key:
             return {"error": "GROK_API_KEY not found"}
         
+        # Debug: Show API key details
+        debug_info = {
+            "key_present": bool(grok_key),
+            "key_length": len(grok_key),
+            "key_start": grok_key[:10] + "..." if grok_key else None,
+            "key_end": "..." + grok_key[-10:] if grok_key and len(grok_key) > 10 else None,
+            "key_has_newline": "\\n" in grok_key if grok_key else False,
+            "key_has_carriage_return": "\\r" in grok_key if grok_key else False
+        }
+        
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {grok_key}",
@@ -144,20 +154,23 @@ async def test_grok():
             return {
                 "status": "success",
                 "response": result["choices"][0]["message"]["content"],
-                "status_code": response.status_code
+                "status_code": response.status_code,
+                "debug": debug_info
             }
         else:
             return {
                 "status": "error",
                 "status_code": response.status_code,
-                "response": response.text
+                "response": response.text,
+                "debug": debug_info
             }
             
     except Exception as e:
         return {
             "status": "error",
             "error": str(e),
-            "error_type": type(e).__name__
+            "error_type": type(e).__name__,
+            "debug": debug_info if 'debug_info' in locals() else None
         }
 
 @app.post("/api/tickets", response_model=TicketResponse)
